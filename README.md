@@ -33,27 +33,35 @@ Output:
 
 
 Create a new Sink:
+
     ./pure-utility.py -c record
 
 
 Move audio stream to the new sink
+
     ./pure-utility.py -m 472 record
 
 
 Write this sink's audio to a file (out.mp3):
+
     ./pure-utility.py -r record
 
 
 Exit recording:
+
     Simply press CTRL+C 
 
 
 Automatically cut the recorded audio file into pieces:
+
     ./pure-utility.py -d out.mp3 120 12
+    
 In this example the tool "mp3splt" will try to create 12 songs, each
 at least 120 seconds long by detecting silence in between the songs
 
 Run a CDDB search, select a album and cut the mp3 file corresponding to
 these album infos:
+
     ./pure-utility.py --cddb out.mp3
+    
 "mp3splt" will interactivly ask your for search terms.
