@@ -4,36 +4,50 @@
 import os
 import sys
 import math
-content = []
-with open("labels.txt") as fh:
-    for line in fh:
-        content.append(line.split())
-    
-content = sorted(content, key=lambda k:float(k[0].replace(",", ".")))
+import argparse
 
-header = """TITLE "UNKNOW ALBUM"
+HEADER = """TITLE "UNKNOW ALBUM"
 PERFORMER "UNKNOWN ARTIST"
 FILE "UNKNOWN.FILE" WAVE"""
 
-title = """TRACK {num} AUDIO
+TITLE = """TRACK {num} AUDIO
     INDEX 01 {index}"""
-
-output = [header]
-for num, entry in enumerate(content):
-    try:
-        start, end, name = entry
-    except ValueError:
-        start, end = entry
-        name = "Unknown"
-    start = float(start.replace(",", "."))
-
-    m,s = divmod(start, 60)
-    f = (s-math.floor(s))
-    idx = ":".join(str(int(i)) for i in (m, s, f))
     
-    output.append(title.format(index=idx, num=num+1))
+def run(filename):
+    content = []
+    with open(filename) as fh:
+        for line in fh:
+            content.append(line.split())
+        
+    content = sorted(content, key=lambda k:float(k[0].replace(",", ".")))
 
-with open("labels.cue", "w") as fh:
-    fh.write("\n".join(output))
+    
+    output = [HEADER]
+    for num, entry in enumerate(content):
+        try:
+            start, end, name = entry
+        except ValueError:
+            start, end = entry
+            name = "Unknown"
+        start = float(start.replace(",", "."))
+    
+        m,s = divmod(start, 60)
+        f = (s-math.floor(s))
+        idx = ":".join(str(int(i)) for i in (m, s, f))
+        
+        output.append(TITLE.format(index=idx, num=num+1))
+    
+    name, ext = os.path.splitext(filename)
+    #~ with open("".join([name, ".cue"]), "w") as fh:
+        #~ fh.write("\n".join(output))
+    print "\n".join(output)
 
-print "done"
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Convert an Audacity label-file to a cue file')
+    parser.add_argument("-f", "--file", dest="inputfile", help='FILE to convert. Pipe output into new file, if you like to.', metavar="FILE")
+    args = parser.parse_args()
+    
+    if args.inputfile:
+        run(args.inputfile)
+    else:
+        parser.print_help()
